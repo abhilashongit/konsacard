@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Credit Card Recommendation Tool</title>
+    <style>
+        @font-face {
+            font-family: 'AirIndia';
+            src: url('https://raw.githubusercontent.com/abhilashongit/ec-backend/main/AirIndiaRegular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'AirIndia';
+            src: url('https://raw.githubusercontent.com/abhilashongit/ec-backend/main/AirIndiaBold.woff2') format('woff2');
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'AirIndia', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1a202c;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00BCD4 0%, #2196F3 50%, #1A237E 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-weight: bold;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section label {
+            display: block;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #1A237E;
+        }
+
+        .form-section input,
+        .form-section select,
+        .form-section textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-family: 'AirIndia', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-section input:focus,
+        .form-section select:focus,
+        .form-section textarea:focus {
+            outline: none;
+            border-color: #00BCD4;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+        }
+
+        .form-section textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .radio-group,
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .radio-option,
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .radio-option:hover,
+        .checkbox-option:hover {
+            border-color: #00BCD4;
+            background: #E0F7FA;
+        }
+
+        .radio-option input,
+        .checkbox-option input {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00BCD4 0%, #2196F3 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'AirIndia', sans-serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            background: linear-gradient(135deg, #00BCD4 0%, #1A237E 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .results-header h2 {
+            font-weight: bold;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .credit-card {
+            background: white;
+            border: 2px solid #E0E0E0;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .credit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            border-color: #00BCD4;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .card-details {
+            padding: 20px;
+        }
+
+        .card-name {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #1A237E;
+            margin-bottom: 10px;
+        }
+
+        .card-info {
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .card-benefits {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .benefit-tag {
+            display: inline-block;
+            background: #E0F7FA;
+            color: #00838F;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin: 4px 4px 4px 0;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #1A237E;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'AirIndia', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #00BCD4;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .no-results h3 {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #1A237E;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .radio-group,
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Credit Card Finder</h1>
+            <p>Find the perfect credit card for your lifestyle in India</p>
+        </div>
+
+        <div class="content">
+            <div id="formSection" class="form-container">
+                <form id="creditCardForm">
+                    <!-- Question 1: Monthly Income -->
+                    <div class="form-section">
+                        <label for="income">1. Monthly Income After Tax (₹)</label>
+                        <input type="number" id="income" name="income" placeholder="Enter your monthly income" required min="0" step="1000">
+                    </div>
+
+                    <!-- Question 2: Monthly Spend -->
+                    <div class="form-section">
+                        <label>2. Monthly Spending Range</label>
+                        <select id="spend" name="spend" required>
+                            <option value="">Select your spending range</option>
+                            <option value="0-10000">₹0 - ₹10,000</option>
+                            <option value="10000-25000">₹10,000 - ₹25,000</option>
+                            <option value="25000-50000">₹25,000 - ₹50,000</option>
+                            <option value="50000-100000">₹50,000 - ₹1,00,000</option>
+                            <option value="100000+">₹1,00,000+</option>
+                        </select>
+                    </div>
+
+                    <!-- Question 3: Biggest Spending Area -->
+                    <div class="form-section">
+                        <label>3. Where Do You Spend the Most?</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="spendingArea" value="household" required>
+                                <span>Household & Groceries</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="spendingArea" value="business">
+                                <span>Business Purchases</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="spendingArea" value="travel">
+                                <span>Travel & Hotels</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="spendingArea" value="ecommerce">
+                                <span>E-commerce</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="spendingArea" value="dining">
+                                <span>Dining & Entertainment</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="spendingArea" value="fuel">
+                                <span>Fuel & Transportation</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 4: Travel Frequency -->
+                    <div class="form-section">
+                        <label>4. How Often Do You Travel?</label>
+                        <select id="travel" name="travel" required>
+                            <option value="">Select travel frequency</option>
+                            <option value="never">Never / Rarely</option>
+                            <option value="quarterly">Quarterly (Every 3 months)</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="weekly">Weekly or more</option>
+                        </select>
+                    </div>
+
+                    <!-- Question 5: Existing Bank Relationships -->
+                    <div class="form-section">
+                        <label>5. Which Banks Do You Have Accounts With?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="banks" value="HDFC">
+                                <span>HDFC Bank</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="banks" value="ICICI">
+                                <span>ICICI Bank</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="banks" value="SBI">
+                                <span>SBI</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="banks" value="Axis">
+                                <span>Axis Bank</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="banks" value="Kotak">
+                                <span>Kotak Mahindra</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="banks" value="IDFC">
+                                <span>IDFC FIRST</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="banks" value="IndusInd">
+                                <span>IndusInd Bank</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="banks" value="AmEx">
+                                <span>American Express</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="banks" value="Standard Chartered">
+                                <span>Standard Chartered</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 6: What They Want -->
+                    <div class="form-section">
+                        <label for="benefits">6. What Benefits Are You Looking For?</label>
+                        <textarea id="benefits" name="benefits" placeholder="e.g., UPI cashback, lounge access, movie vouchers, fuel surcharge waiver, reward points, milestone benefits" required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Find My Perfect Card</button>
+                </form>
+            </div>
+
+            <div id="resultsSection" class="results-container">
+                <button class="back-btn" onclick="resetForm()">← Start Over</button>
+                <div class="results-header">
+                    <h2>Your Recommended Cards</h2>
+                    <p>Based on your preferences and spending patterns</p>
+                </div>
+                <div id="resultsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Comprehensive Indian Credit Card Database (Active cards as of 2025)
+        const creditCardsDB = [
+            // HDFC Bank Cards
+            {
+                name: "HDFC Regalia Gold",
+                bank: "HDFC",
+                minIncome: 180000,
+                spendCategory: ["travel", "dining", "ecommerce"],
+                loungeAccess: true,
+                quarterlySpendRequired: 75000,
+                benefits: ["lounge", "rewards", "travel", "dining", "milestone"],
+                annualFee: 2500,
+                image: "HDFC Regalia Gold"
+            },
+            {
+                name: "HDFC Millennia",
+                bank: "HDFC",
+                minIncome: 25000,
+                spendCategory: ["ecommerce", "household"],
+                loungeAccess: true,
+                quarterlySpendRequired: 30000,
+                benefits: ["cashback", "ecommerce", "lounge", "rewards"],
+                annualFee: 1000,
+                image: "HDFC Millennia"
+            },
+            {
+                name: "HDFC Diners Club Black",
+                bank: "HDFC",
+                minIncome: 300000,
+                spendCategory: ["travel", "dining", "business"],
+                loungeAccess: true,
+                quarterlySpendRequired: 150000,
+                benefits: ["lounge", "travel", "rewards", "milestone", "concierge"],
+                annualFee: 10000,
+                image: "HDFC Diners Club Black"
+            },
+            {
+                name: "HDFC MoneyBack+",
+                bank: "HDFC",
+                minIncome: 18000,
+                spendCategory: ["household", "ecommerce", "fuel"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["cashback", "fuel", "rewards"],
+                annualFee: 500,
+                image: "HDFC MoneyBack+"
+            },
+            {
+                name: "HDFC Infinia",
+                bank: "HDFC",
+                minIncome: 300000,
+                spendCategory: ["travel", "dining", "business"],
+                loungeAccess: true,
+                quarterlySpendRequired: 240000,
+                benefits: ["lounge", "travel", "rewards", "milestone", "concierge", "golf"],
+                annualFee: 12500,
+                image: "HDFC Infinia"
+            },
+
+            // ICICI Bank Cards
+            {
+                name: "ICICI Amazon Pay",
+                bank: "ICICI",
+                minIncome: 20000,
+                spendCategory: ["ecommerce", "household"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["cashback", "ecommerce", "rewards"],
+                annualFee: 0,
+                image: "ICICI Amazon Pay"
+            },
+            {
+                name: "ICICI Sapphiro",
+                bank: "ICICI",
+                minIncome: 150000,
+                spendCategory: ["travel", "dining", "ecommerce"],
+                loungeAccess: true,
+                quarterlySpendRequired: 60000,
+                benefits: ["lounge", "travel", "rewards", "dining", "milestone"],
+                annualFee: 6500,
+                image: "ICICI Sapphiro"
+            },
+            {
+                name: "ICICI Coral",
+                bank: "ICICI",
+                minIncome: 50000,
+                spendCategory: ["household", "dining", "fuel"],
+                loungeAccess: true,
+                quarterlySpendRequired: 45000,
+                benefits: ["lounge", "fuel", "rewards", "dining"],
+                annualFee: 500,
+                image: "ICICI Coral"
+            },
+            {
+                name: "ICICI Emeralde",
+                bank: "ICICI",
+                minIncome: 300000,
+                spendCategory: ["travel", "business", "dining"],
+                loungeAccess: true,
+                quarterlySpendRequired: 150000,
+                benefits: ["lounge", "travel", "rewards", "concierge", "golf", "milestone"],
+                annualFee: 12000,
+                image: "ICICI Emeralde"
+            },
+
+            // Axis Bank Cards
+            {
+                name: "Axis ACE",
+                bank: "Axis",
+                minIncome: 18000,
+                spendCategory: ["ecommerce", "dining", "fuel"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["cashback", "UPI", "ecommerce", "dining"],
+                annualFee: 499,
+                image: "Axis ACE"
+            },
+            {
+                name: "Axis Magnus",
+                bank: "Axis",
+                minIncome: 250000,
+                spendCategory: ["travel", "business", "dining"],
+                loungeAccess: true,
+                quarterlySpendRequired: 150000,
+                benefits: ["lounge", "travel", "rewards", "milestone", "golf", "concierge"],
+                annualFee: 12500,
+                image: "Axis Magnus"
+            },
+            {
+                name: "Axis Vistara Infinite",
+                bank: "Axis",
+                minIncome: 150000,
+                spendCategory: ["travel", "dining"],
+                loungeAccess: true,
+                quarterlySpendRequired: 60000,
+                benefits: ["lounge", "travel", "miles", "rewards"],
+                annualFee: 10000,
+                image: "Axis Vistara Infinite"
+            },
+            {
+                name: "Axis Flipkart",
+                bank: "Axis",
+                minIncome: 20000,
+                spendCategory: ["ecommerce", "household"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["cashback", "ecommerce", "vouchers"],
+                annualFee: 500,
+                image: "Axis Flipkart"
+            },
+
+            // SBI Cards
+            {
+                name: "SBI SimplyCLICK",
+                bank: "SBI",
+                minIncome: 20000,
+                spendCategory: ["ecommerce", "household"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["rewards", "ecommerce", "vouchers", "fuel"],
+                annualFee: 499,
+                image: "SBI SimplyCLICK"
+            },
+            {
+                name: "SBI Card ELITE",
+                bank: "SBI",
+                minIncome: 200000,
+                spendCategory: ["travel", "dining", "business"],
+                loungeAccess: true,
+                quarterlySpendRequired: 75000,
+                benefits: ["lounge", "travel", "rewards", "milestone", "golf"],
+                annualFee: 4999,
+                image: "SBI Card ELITE"
+            },
+            {
+                name: "SBI Cashback",
+                bank: "SBI",
+                minIncome: 20000,
+                spendCategory: ["ecommerce", "household", "fuel"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["cashback", "ecommerce", "fuel"],
+                annualFee: 999,
+                image: "SBI Cashback"
+            },
+
+            // Kotak Mahindra Cards
+            {
+                name: "Kotak Royale Signature",
+                bank: "Kotak",
+                minIncome: 100000,
+                spendCategory: ["travel", "dining", "ecommerce"],
+                loungeAccess: true,
+                quarterlySpendRequired: 45000,
+                benefits: ["lounge", "travel", "rewards", "dining"],
+                annualFee: 999,
+                image: "Kotak Royale Signature"
+            },
+            {
+                name: "Kotak League Platinum",
+                bank: "Kotak",
+                minIncome: 30000,
+                spendCategory: ["household", "fuel", "ecommerce"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["rewards", "fuel", "movie"],
+                annualFee: 500,
+                image: "Kotak League Platinum"
+            },
+
+            // IDFC FIRST Cards
+            {
+                name: "IDFC FIRST Wealth",
+                bank: "IDFC",
+                minIncome: 200000,
+                spendCategory: ["travel", "dining", "business"],
+                loungeAccess: true,
+                quarterlySpendRequired: 60000,
+                benefits: ["lounge", "travel", "rewards", "milestone", "golf"],
+                annualFee: 10000,
+                image: "IDFC FIRST Wealth"
+            },
+            {
+                name: "IDFC FIRST Classic",
+                bank: "IDFC",
+                minIncome: 15000,
+                spendCategory: ["household", "ecommerce", "fuel"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["rewards", "fuel", "ecommerce"],
+                annualFee: 0,
+                image: "IDFC FIRST Classic"
+            },
+
+            // IndusInd Bank Cards
+            {
+                name: "IndusInd Legend",
+                bank: "IndusInd",
+                minIncome: 300000,
+                spendCategory: ["travel", "business", "dining"],
+                loungeAccess: true,
+                quarterlySpendRequired: 150000,
+                benefits: ["lounge", "travel", "rewards", "milestone", "concierge", "golf"],
+                annualFee: 10000,
+                image: "IndusInd Legend"
+            },
+            {
+                name: "IndusInd Pinnacle",
+                bank: "IndusInd",
+                minIncome: 100000,
+                spendCategory: ["travel", "dining", "ecommerce"],
+                loungeAccess: true,
+                quarterlySpendRequired: 45000,
+                benefits: ["lounge", "travel", "rewards", "dining"],
+                annualFee: 3000,
+                image: "IndusInd Pinnacle"
+            },
+
+            // American Express Cards
+            {
+                name: "AmEx Platinum Card",
+                bank: "AmEx",
+                minIncome: 300000,
+                spendCategory: ["travel", "business", "dining"],
+                loungeAccess: true,
+                quarterlySpendRequired: 150000,
+                benefits: ["lounge", "travel", "rewards", "milestone", "concierge", "hotel"],
+                annualFee: 60000,
+                image: "AmEx Platinum Card"
+            },
+            {
+                name: "AmEx Membership Rewards",
+                bank: "AmEx",
+                minIncome: 60000,
+                spendCategory: ["household", "ecommerce", "dining"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["rewards", "travel", "dining"],
+                annualFee: 1500,
+                image: "AmEx Membership Rewards"
+            },
+            {
+                name: "AmEx Gold Card",
+                bank: "AmEx",
+                minIncome: 30000,
+                spendCategory: ["household", "dining", "ecommerce"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["rewards", "dining", "movie", "vouchers"],
+                annualFee: 1000,
+                image: "AmEx Gold Card"
+            },
+
+            // Standard Chartered Cards
+            {
+                name: "Standard Chartered Ultimate",
+                bank: "Standard Chartered",
+                minIncome: 300000,
+                spendCategory: ["travel", "business", "dining"],
+                loungeAccess: true,
+                quarterlySpendRequired: 150000,
+                benefits: ["lounge", "travel", "rewards", "miles", "golf", "concierge"],
+                annualFee: 5000,
+                image: "Standard Chartered Ultimate"
+            },
+            {
+                name: "Standard Chartered DigiSmart",
+                bank: "Standard Chartered",
+                minIncome: 36000,
+                spendCategory: ["ecommerce", "household", "dining"],
+                loungeAccess: false,
+                quarterlySpendRequired: 0,
+                benefits: ["cashback", "ecommerce", "dining", "movie"],
+                annualFee: 499,
+                image: "Standard Chartered DigiSmart"
+            }
+        ];
+
+        // Form submission handler
+        document.getElementById('creditCardForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get form values
+            const income = parseInt(document.getElementById('income').value);
+            const spendRange = document.getElementById('spend').value;
+            const spendingArea = document.querySelector('input[name="spendingArea"]:checked').value;
+            const travelFrequency = document.getElementById('travel').value;
+            const selectedBanks = Array.from(document.querySelectorAll('input[name="banks"]:checked')).map(cb => cb.value);
+            const desiredBenefits = document.getElementById('benefits').value.toLowerCase();
+
+            // Calculate monthly spend (use midpoint of range)
+            let monthlySpend = 0;
+            switch(spendRange) {
+                case '0-10000': monthlySpend = 5000; break;
+                case '10000-25000': monthlySpend = 17500; break;
+                case '25000-50000': monthlySpend = 37500; break;
+                case '50000-100000': monthlySpend = 75000; break;
+                case '100000+': monthlySpend = 150000; break;
+            }
+
+            // Apply recommendation algorithm
+            let recommendedCards = filterCards(
+                creditCardsDB,
+                income,
+                monthlySpend,
+                spendingArea,
+                travelFrequency,
+                selectedBanks,
+                desiredBenefits
+            );
+
+            // Display results
+            displayResults(recommendedCards);
+        });
+
+        function filterCards(cards, income, monthlySpend, spendingArea, travelFreq, banks, benefits) {
+            let filtered = [...cards];
+
+            // Step 1: Filter by income eligibility
+            filtered = filtered.filter(card => income >= card.minIncome);
+
+            // Step 2: Filter by spending category
+            filtered = filtered.filter(card => card.spendCategory.includes(spendingArea));
+
+            // Step 3: Sort by spending fit and keep top 70%
+            filtered = filtered.sort((a, b) => {
+                const aMatch = a.spendCategory.indexOf(spendingArea);
+                const bMatch = b.spendCategory.indexOf(spendingArea);
+                return aMatch - bMatch;
+            });
+            const keepCount = Math.ceil(filtered.length * 0.7);
+            filtered = filtered.slice(0, keepCount);
+
+            // Step 4: Filter by lounge access requirement
+            if (travelFreq !== 'never') {
+                const quarterlySpend = monthlySpend * 3;
+                filtered = filtered.filter(card => {
+                    if (!card.loungeAccess) return false;
+                    return quarterlySpend >= card.quarterlySpendRequired;
+                });
+            }
+
+            // Step 5: Filter by existing bank relationships
+            if (banks.length > 0) {
+                filtered = filtered.filter(card => banks.includes(card.bank));
+            }
+
+            // Step 6: Score by benefit matching
+            const benefitKeywords = benefits.split(/[\s,]+/).filter(w => w.length > 2);
+            filtered = filtered.map(card => {
+                let score = 0;
+                benefitKeywords.forEach(keyword => {
+                    card.benefits.forEach(benefit => {
+                        if (benefit.includes(keyword) || keyword.includes(benefit)) {
+                            score++;
+                        }
+                    });
+                });
+                return { ...card, matchScore: score };
+            });
+
+            // Sort by match score
+            filtered.sort((a, b) => b.matchScore - a.matchScore);
+
+            return filtered;
+        }
+
+        function displayResults(cards) {
+            const formSection = document.getElementById('formSection');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsContent = document.getElementById('resultsContent');
+
+            formSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+
+            if (cards.length === 0) {
+                resultsContent.innerHTML = `
+                    <div class="no-results">
+                        <h3>No Perfect Match Found</h3>
+                        <p>Try adjusting your criteria or selecting different banks.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="card-grid">';
+            cards.forEach(card => {
+                html += `
+                    <div class="credit-card">
+                        <div class="card-image">${card.image}</div>
+                        <div class="card-details">
+                            <div class="card-name">${card.name}</div>
+                            <div class="card-info">🏦 ${card.bank} Bank</div>
+                            <div class="card-info">💰 Annual Fee: ₹${card.annualFee.toLocaleString('en-IN')}</div>
+                            <div class="card-info">📊 Min Income: ₹${card.minIncome.toLocaleString('en-IN')}/month</div>
+                            ${card.loungeAccess ? '<div class="card-info">✈️ Lounge Access Available</div>' : ''}
+                            <div class="card-benefits">
+                                ${card.benefits.map(b => `<span class="benefit-tag">${b}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            resultsContent.innerHTML = html;
+        }
+
+        function resetForm() {
+            document.getElementById('formSection').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('creditCardForm').reset();
+        }
+    </script>
+</body>
+</html>
